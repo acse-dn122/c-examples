@@ -31,6 +31,7 @@ int main()
         int value = stoi(myText.substr(pos, -1));
         data[name].push_back(value);
     }
+    myReadFile.close();
 
     double total_sum = 0;
     int sizes = 0;
