@@ -1,0 +1,6 @@
+John 101.7 1
+Jane 21 1
+Pippa 58.78 0
+John 50 0
+Lawrence 103.98 1
+Ellie-May 67.83 1

@@ -41,7 +41,6 @@ int main()
          << chrono::duration_cast<chrono::nanoseconds>(end - start).count()
          << " ns" << endl;
 
-
     cout << "------List------" << endl;
     list<int> l;
     while (l.size() < 10000)
@@ -59,7 +58,6 @@ int main()
     cout << "Elapsed time in nanoseconds: "
          << chrono::duration_cast<chrono::nanoseconds>(end - start).count()
          << " ns" << endl;
-
 
     cout << "------Set------" << endl;
     set<int> s;
@@ -83,7 +81,14 @@ int main()
     std::cout << "List size: " << l.size() * sizeof(int) << " bytes\n";
     std::cout << "Set size: " << s.size() * sizeof(int) << " bytes\n";
 
-    std::cout << "Vector size: " << sizeof(vec) << " bytes\n";
-    std::cout << "List size: " << sizeof(l) << " bytes\n";
-    std::cout << "Set size: " << sizeof(s) << " bytes\n";
+    std::cout << "Total vector size: " << vec.size() * sizeof(int) + sizeof(int *) + sizeof(int) << " bytes\n";
+    std::cout << "Total vector size: " << vec.size() * sizeof(double) + sizeof(double *) + sizeof(int) << " bytes\n";
+    std::cout << "Total list size: " << l.size() * sizeof(int) + sizeof(int *) + sizeof(int) << " bytes\n";
+    std::cout << "Total set size: " << s.size() * sizeof(int) + sizeof(int *) + sizeof(int) << " bytes\n";
+
+    std::cout << "pointer size: " << sizeof(vec) << " bytes\n";
+    std::cout << "pointer size: " << sizeof(int) << " bytes\n";
+    std::cout << "pointer size: " << sizeof(int*) << " bytes\n";
+
+    return 0;
 }
