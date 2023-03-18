@@ -1,5 +1,6 @@
 #include <iostream>
 #include "CSRMatrix.h"
+using namespace std;
 
 // Constructor - using an initialisation list here
 template <class T>
@@ -73,7 +74,7 @@ CSRMatrix<T>::CSRMatrix(Matrix<T> &input) : Matrix<T>(input.rows, input.cols, fa
 
 // Copy constructor
 template <class T>
-CSRMatrix<T>::CSRMatrix(const CSRMatrix &old_obj): Matrix<T>(old_obj.rows, old_obj.cols, false)
+CSRMatrix<T>::CSRMatrix(const CSRMatrix &old_obj) : Matrix<T>(old_obj.rows, old_obj.cols, false)
 {
    *this = old_obj;
    // This `new` here is now detaching our `.values` attribute from the `old_obj`'s
@@ -193,6 +194,126 @@ void CSRMatrix<T>::matMatMult(CSRMatrix<T> &mat_left, CSRMatrix<T> &output)
    }
 
    // HOW DO WE SET THE SPARSITY OF OUR OUTPUT MATRIX HERE??
+   // Set the output to zero
+   for (int i = 0; i < mat_left.rows; i++)
+   {
+      for (int j = 0; j < this->cols; j++)
+      {
+         output[i * this->cols + j] = 0.0;
+      }
+   }
+
+   // // Loop over each row
+   // for (int i = 0; i < mat_left.rows; i++)
+   // {
+   //    for (int j = 0; j < this->cols; j++)
+   //    {
+   //       // Loop over all the entries in this col
+   //       for (int left_index = mat_left.row_position[i]; val_index < mat_left.row_position[i + 1]; val_index++)
+   //       {  
+   //          for (int this_index = this->row_position[i]; this_index < this->row_position[i + 1]; this_index++)
+   //          {
+   //          // This is an example of indirect addressing
+   //          // Can make it harder for the compiler to vectorise!
+   //          output[i * this->cols + j] += this->values[val_index] * input[this->col_index[val_index]];
+   //          }
+   //       }
+   //    }
+   // }
+}
+
+// Question C.3
+template <class T>
+void CSRMatrix<T>::copyDropValues(T tol, Matrix<T> &input)
+{
+   // Calculate how many nnzs by iterating over all the values in the dense input and incrementing
+   // the zeros counter by 1 each time we encounter a non-zero number
+   this->nnzs = 0;
+   for (int i = 0; i < (input.rows * input.cols); i++)
+   {
+      if (input.values[i] > tol)
+      {
+         this->nnzs++;
+      }
+   }
+   // Declare array pointers on heap based on what we've just learnt about how many nnzs there are.
+   this->values = new T[this->nnzs];
+   this->row_position = new int[this->rows + 1];
+   this->col_index = new int[this->nnzs];
+
+   // Fill in row_position and col_index arrays values based on matrix
+   int count = 0;
+   this->row_position[0] = 0;
+   for (int i = 0; i < this->rows; i++)
+   {
+      int nnzs_in_row = 0; // Reset the row nnzs count to zero at the start of each new row
+      for (int j = 0; j < this->cols; j++)
+      {
+         // Only do stuff IFF we encounter a non-zero
+         if (input.values[i * input.cols + j] > tol)
+         {
+            // Fill the values array in order of how they occur in the input matrix.
+            this->values[count] = input.values[i * input.cols + j];
+            // Fill in the column index at the same rate as the values array gets filled
+            // with the column index at this point.
+            this->col_index[count] = j;
+            // Increment the nnzs in row count by one
+            nnzs_in_row++;
+            count++;
+         }
+      }
+      // row position is effectively a running count of nnzs we encounter in each row.
+      this->row_position[i + 1] = this->row_position[i] + nnzs_in_row; // row fill is always one index ahead
+   }
+}
+
+// Question C.4
+// template <class T>
+// void CSRMatrix<T>::dense2sparse(Matrix<T> &input, CSRMatrix<T> &output)
+// {
+
+// }
+
+// Question C.5
+template <class T>
+void CSRMatrix<T>::sparse2dense(Matrix<T> &output)
+{
+   // output.rows = this->rows;
+   // output.cols = this->cols;
+   // output.values = new T[output.rows * output.cols];
+   for (int i = 0; i < this->rows; ++i)
+   {
+      for (int j = 0; j < (this->row_position[i + 1] - this->row_position[i]); ++j)
+      {
+         int col = this->col_index[row_position[i] + j];
+         output.values[i * this->rows + col] = this->values[row_position[i] + j];
+      }
+   }
+}
+
+// Question C.6
+template <class T>
+T *CSRMatrix<T>::getInverseDiagonal()
+{
+   T *ptr = new T[min(this->rows, this->cols)];
+   for (int i = 0; i < min(this->rows, this->cols); ++i)
+   {
+      for (int j = 0; j < (this->row_position[i + 1] - this->row_position[i]); ++j)
+      {
+         int col = this->col_index[row_position[i] + j];
+         if (col == i)
+         {
+            ptr[i] = 1 / this->values[row_position[i] + j];
+            break;
+         }
+         else
+         {
+            ptr[i] = 0;
+         }
+      }
+   }
+   // myShrdPtr<T> sharePtr(ptr);
+   return ptr;
 }
 
 template class CSRMatrix<int>;

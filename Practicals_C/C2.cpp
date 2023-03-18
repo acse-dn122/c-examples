@@ -30,7 +30,7 @@ class myShrdPtr
 
 public:
     // Constructor
-    explicit myShrdPtr(T *p = NULL)
+    explicit myShrdPtr(T *p = nullptr)
     {
         ptr = p;
         *count = 1;
@@ -81,37 +81,60 @@ public:
     }
 };
 
-int main()
-{
-    cout << "--- Shared pointers ptr1 ---\n";
-    myShrdPtr<int> ptr1(new int());
-    *ptr1 = 20;
-    cout << ptr1;
+// template<typename T>
+// class myWeakPtr {
+// public:
+//     myWeakPtr() : counter(nullptr), ptr(nullptr) {}
 
-    cout << "\n--- Shared pointers ptr1, ptr2 ---\n";
-    myShrdPtr<int> ptr2(ptr1);
-    *ptr2 = 10;
-    cout << ptr1;
-    cout << ptr2;
+//     myWeakPtr(const myShrdPtr<T>& other) : counter(other.counter), ptr(other.ptr) {}
 
-    {
-        cout << "\n--- Shared pointers ptr1, ptr2, ptr3 ---\n";
-        myShrdPtr<int> ptr3(ptr1);
-        *ptr1 = 50;
-        cout << ptr1;
-        cout << ptr2;
-        cout << ptr3;
+//     std::shared_ptr<T> lock() {
+//         if (expired()) {
+//             return std::shared_ptr<T>();
+//         }
+//         return std::shared_ptr<T>(counter, ptr);
+//     }
 
-        cout << "\nCounter before destroy: " << ptr1.use_count() << endl;
-    }
+//     bool expired() const {
+//         return counter == nullptr || counter->count == 0;
+//     }
 
-    cout << "Counter after destroy: " << ptr1.use_count() << endl;
+// private:
+//     std::atomic<int>* counter;
+//     T* ptr;
+// };
 
-    cout << "\n--- Shared pointers ptr1, ptr2 ---\n";
-    cout << ptr1;
-    cout << ptr2;
+// int main()
+// {
+//     cout << "--- Shared pointers ptr1 ---\n";
+//     myShrdPtr<int> ptr1(new int());
+//     *ptr1 = 20;
+//     cout << ptr1;
+
+//     cout << "\n--- Shared pointers ptr1, ptr2 ---\n";
+//     myShrdPtr<int> ptr2(ptr1);
+//     *ptr2 = 10;
+//     cout << ptr1;
+//     cout << ptr2;
+
+//     {
+//         cout << "\n--- Shared pointers ptr1, ptr2, ptr3 ---\n";
+//         myShrdPtr<int> ptr3(ptr1);
+//         *ptr1 = 50;
+//         cout << ptr1;
+//         cout << ptr2;
+//         cout << ptr3;
+
+//         cout << "\nCounter before destroy: " << ptr1.use_count() << endl;
+//     }
+
+//     cout << "Counter after destroy: " << ptr1.use_count() << endl;
+
+//     cout << "\n--- Shared pointers ptr1, ptr2 ---\n";
+//     cout << ptr1;
+//     cout << ptr2;
     
-    return 0;
-}
+//     return 0;
+// }
 
 // g++ -std=c++11 C2.cpp ../assessment_matrix/CSRMatrix.cpp ../assessment_matrix/Matrix.cpp -o C2
